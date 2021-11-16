@@ -1,0 +1,39 @@
+{% extends "layout/layout.html" %}
+
+
+{% block content %}
+
+{% if messages %}
+<h1>ERROR</h1>
+<ul class="messages">
+	{% for message in messages %}
+	<li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+		{% endfor %}
+</ul>
+{% endif %}
+
+<form class="form" method="POST">
+	{% csrf_token %}
+	<label>Primary Key</label>
+	<input type="number" name="primary_key" required>
+
+	<input type="submit" name="buscar" value="Buscar">
+</form>
+<form class="form" method="POST">
+	{% csrf_token %}
+	<table>
+		{{form.media}}
+		{{form.as_table}}
+	</table>
+	<input type="submit" name="crear" value="Crear">
+	{% if disabled %}
+	<input type="submit" name="borrar" value="Borrar">
+	<input type="submit" name="actualizar" value="Actualizar">
+	{%endif%}
+
+</form>
+<a href="/"><button>Regresar</button></a>
+
+
+<script type="text/javascript" src="{% url 'jsi18n' %}"></script>
+{% endblock %}

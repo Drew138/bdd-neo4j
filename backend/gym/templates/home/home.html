@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Gestor de Gimnasio</title>
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="{% static 'styles/home.css'%}">
+	<link rel="stylesheet" type="text/css" href="{% static 'admin/css/widgets.css' %}">
+</head>
+
+<body>
+	<div class="">
+		<h1>GESTION DE INFORMACION DEL GIMNASIO</h1>
+		<a href="equipo/"><button class="button button--hyperion"><span><span>Gestion Equipos de
+						Entrenamiento</span></span></button></a>
+		<a href="persona/"><button class="button button--hyperion"><span><span>Gestion de
+						Personas</span></span></button></a>
+		<a href="clase/"><button class="button button--hyperion"><span><span>Gestion de
+						Clases</span></span></button></a>
+		<a href="zona/"><button class="button button--hyperion"><span><span>Gestion Listas de
+						Zona</span></span></button></a>
+		<a href="rutina/"><button class="button button--hyperion"><span><span>Gestion de
+						Rutinas</span></span></button></a>
+		<a href="calendario/"><button class="button button--hyperion"><span><span>Gestion de
+						Calendario</span></span></button></a>
+	</div>
+</body>
+
+</html>
