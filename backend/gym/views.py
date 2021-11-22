@@ -1,19 +1,45 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from .forms import *
 from .models import *
 from django.contrib import messages
+
+def connection_helper(table, form, related_model):
+    # print(form['zona'].value())
+    instance = table(id=int(form[related_model].value()))
+    instance.refresh()
+    return instance
+
+def connection_helper_many_to_many(table, form, related_model):
+    sol = []
+    for key in form[related_model].value():
+        instance = table(id=int(key))
+        instance.refresh()
+        sol.append(instance)
+    return sol
+
+def search_model_instance(model, id):
+    objects = model.nodes.all()
+    for instance in objects:
+        if instance.id == int(id):
+            return instance
+    return None
 
 
 def ClaseView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
-        instance = get_object_or_404(Clase, id=pk)
+        instance = search_model_instance(Clase, pk)
         if request.method == 'POST':
             form = ClaseForm(request.POST, instance=instance)
             if 'crear' in request.POST:
                 form = ClaseForm(request.POST)
                 if form.is_valid():
-                    form.save()
+                    clase1 = form.save()
+                    clase1.zona.connect(connection_helper(Zona, form, 'zona'))
+                    clase1.calendario.connect(connection_helper(Calendario, form, 'calendario'))
+                    clase1.rutina.connect(connection_helper(Rutina, form, 'rutina'))
+                    for equipo in connection_helper_many_to_many(EquipoDeEntrenamiento, form, "equipos_de_entrenamiento"):
+                        clase1.equipos_de_entrenamiento.connect(equipo)
                     return redirect('/clase/')
                 else:
                     messages.error(request, form.errors)
@@ -22,12 +48,21 @@ def ClaseView(request, *args, **kwargs):
                 return redirect('/')
             elif 'actualizar' in request.POST:
                 if form.is_valid():
-                    form.save()
+                    clase1 = form.save()
+                    clase1.zona.disconnect_all()
+                    clase1.calendario.disconnect_all()
+                    clase1.rutina.disconnect_all()
+                    clase1.equipos_de_entrenamiento.disconnect_all()
+                    clase1.zona.connect(connection_helper(Zona, form, 'zona'))
+                    clase1.calendario.connect(connection_helper(Calendario, form, 'calendario'))
+                    clase1.rutina.connect(connection_helper(Rutina, form, 'rutina'))
+                    for equipo in connection_helper_many_to_many(EquipoDeEntrenamiento, form, "equipos_de_entrenamiento"):
+                        clase1.equipos_de_entrenamiento.connect(equipo)
                     return redirect(f'/clase/{pk}/')
                 messages.error(request, form.errors)
             elif 'buscar' in request.POST:
                 pk = request.POST.get('primary_key', None) or pk
-                if Clase.objects.filter(pk=pk).count() > 0:
+                if search_model_instance(Clase, pk) != None:
                     return redirect(f'/clase/{pk}/')
                 else:
                     messages.error(request, "Clase no encontrada")
@@ -38,13 +73,19 @@ def ClaseView(request, *args, **kwargs):
         if 'crear' in request.POST:
             form = ClaseForm(request.POST)
             if form.is_valid():
-                form.save()
+                clase1 = form.save()
+                clase1.zona.connect(connection_helper(Zona, form, 'zona'))
+                clase1.calendario.connect(connection_helper(Calendario, form, 'calendario'))
+                clase1.rutina.connect(connection_helper(Rutina, form, 'rutina'))
+                for equipo in connection_helper_many_to_many(EquipoDeEntrenamiento, form, "equipos_de_entrenamiento"):
+                    clase1.equipos_de_entrenamiento.connect(equipo)
+
                 return redirect('/clase/')
             else:
                 messages.error(request, form.errors)
         elif 'buscar' in request.POST:
             pk = request.POST.get('primary_key')
-            if pk is None or Clase.objects.filter(pk=pk).count() <= 0:
+            if pk is None or search_model_instance(Clase, pk) == None:
                 messages.error(request, "Clase no encontrada")
                 form = ClaseForm()
             else:
@@ -60,7 +101,9 @@ def ClaseView(request, *args, **kwargs):
 def CalendarioView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
-        instance = get_object_or_404(Calendario, id=pk)
+        instance = search_model_instance(Calendario, pk)
+        if instance == None: 
+            raise Exception('404 alejo es gay')
         if request.method == 'POST':
             form = CalendarioForm(request.POST, instance=instance)
             if 'crear' in request.POST:
@@ -80,7 +123,7 @@ def CalendarioView(request, *args, **kwargs):
                 messages.error(request, form.errors)
             elif 'buscar' in request.POST:
                 pk = request.POST.get('primary_key', None) or pk
-                if Calendario.objects.filter(pk=pk).count() > 0:
+                if search_model_instance(Calendario, pk) != None:
                     return redirect(f'/calendario/{pk}/')
                 else:
                     messages.error(request, "Calendario no encontrada")
@@ -97,7 +140,8 @@ def CalendarioView(request, *args, **kwargs):
                 messages.error(request, form.errors)
         elif 'buscar' in request.POST:
             pk = request.POST.get('primary_key')
-            if pk is None or Calendario.objects.filter(pk=pk).count() <= 0:
+            # print(search_model_instance(Calendario, pk))
+            if pk is None or search_model_instance(Calendario, pk) == None:
                 messages.error(request, "Calendario no encontrada")
                 form = CalendarioForm()
             else:
@@ -113,9 +157,10 @@ def CalendarioView(request, *args, **kwargs):
 def ZonaView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
-        instance = get_object_or_404(Zona, id=pk)
+        instance = search_model_instance(Zona, pk)
         if request.method == 'POST':
             form = ZonaForm(request.POST, instance=instance)
+            print(request.POST)
             if 'crear' in request.POST:
                 form = ZonaForm(request.POST)
                 if form.is_valid():
@@ -132,12 +177,16 @@ def ZonaView(request, *args, **kwargs):
                     return redirect(f'/zona/{pk}/')
                 messages.error(request, form.errors)
             elif 'buscar' in request.POST:
+                
+
                 pk = request.POST.get('primary_key', None) or pk
-                if Zona.objects.filter(pk=pk).count() > 0:
-                    return redirect(f'/zona/{pk}/')
-                else:
+
+                if pk is None or search_model_instance(Zona, pk) == None:
                     messages.error(request, "Zona no encontrada")
                     form = ZonaForm()
+                
+                else:
+                    return redirect(f'/zona/{pk}/')
         else:
             form = ZonaForm(instance=instance)
     elif request.method == 'POST':
@@ -150,7 +199,7 @@ def ZonaView(request, *args, **kwargs):
                 messages.error(request, form.errors)
         elif 'buscar' in request.POST:
             pk = request.POST.get('primary_key')
-            if pk is None or Zona.objects.filter(pk=pk).count() <= 0:
+            if pk is None or search_model_instance(Zona, pk) == None:
                 messages.error(request, "Zona no encontrada")
                 form = ZonaForm()
             else:
@@ -166,7 +215,7 @@ def ZonaView(request, *args, **kwargs):
 def RutinaView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
-        instance = get_object_or_404(Rutina, id=pk)
+        instance = search_model_instance(Rutina, pk)
         if request.method == 'POST':
             form = RutinaForm(request.POST, instance=instance)
             if 'crear' in request.POST:
@@ -186,7 +235,7 @@ def RutinaView(request, *args, **kwargs):
                 messages.error(request, form.errors)
             elif 'buscar' in request.POST:
                 pk = request.POST.get('primary_key', None) or pk
-                if Rutina.objects.filter(pk=pk).count() > 0:
+                if search_model_instance(Rutina, pk) != None:
                     return redirect(f'/rutina/{pk}/')
                 else:
                     messages.error(request, "Rutina no encontrada")
@@ -203,7 +252,7 @@ def RutinaView(request, *args, **kwargs):
                 messages.error(request, form.errors)
         elif 'buscar' in request.POST:
             pk = request.POST.get('primary_key')
-            if pk is None or Rutina.objects.filter(pk=pk).count() <= 0:
+            if pk is None or search_model_instance(Rutina, pk) == None:
                 messages.error(request, "Rutina no encontrada")
                 form = RutinaForm()
             else:
@@ -219,13 +268,15 @@ def RutinaView(request, *args, **kwargs):
 def PersonaView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
-        instance = get_object_or_404(Persona, id=pk)
+        instance = search_model_instance(Persona, pk)
         if request.method == 'POST':
             form = PersonaForm(request.POST, instance=instance)
             if 'crear' in request.POST:
                 form = PersonaForm(request.POST)
                 if form.is_valid():
-                    form.save()
+                    persona1 = form.save()
+                    for clase in connection_helper_many_to_many(Clase, form, "clase"):
+                        persona1.clases.connect(clase)
                     return redirect('/persona/')
                 else:
                     messages.error(request, form.errors)
@@ -234,12 +285,15 @@ def PersonaView(request, *args, **kwargs):
                 return redirect('/')
             elif 'actualizar' in request.POST:
                 if form.is_valid():
-                    form.save()
+                    persona1 = form.save()
+                    persona1.clases.disconnect_all()
+                    for clase in connection_helper_many_to_many(Clase, form, "clases"):
+                        persona1.clases.connect(clase)
                     return redirect(f'/persona/{pk}/')
                 messages.error(request, form.errors)
             elif 'buscar' in request.POST:
                 pk = request.POST.get('primary_key', None) or pk
-                if Persona.objects.filter(pk=pk).count() > 0:
+                if search_model_instance(Persona, pk) != None:
                     return redirect(f'/persona/{pk}/')
                 else:
                     messages.error(request, "Persona no encontrada")
@@ -250,13 +304,15 @@ def PersonaView(request, *args, **kwargs):
         if 'crear' in request.POST:
             form = PersonaForm(request.POST)
             if form.is_valid():
-                form.save()
+                persona1 = form.save()
+                for clase in connection_helper_many_to_many(Clase, form, "clases"):
+                        persona1.clases.connect(clase)
                 return redirect('/persona/')
             else:
                 messages.error(request, form.errors)
         elif 'buscar' in request.POST:
             pk = request.POST.get('primary_key')
-            if pk is None or Persona.objects.filter(pk=pk).count() <= 0:
+            if pk is None or search_model_instance(Persona, pk) == None:
                 messages.error(request, "Persona no encontrada")
                 form = PersonaForm()
             else:
@@ -272,13 +328,15 @@ def PersonaView(request, *args, **kwargs):
 def EquipoDeEntrenamientoView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
-        instance = get_object_or_404(EquipoDeEntrenamiento, id=pk)
+        instance = search_model_instance(EquipoDeEntrenamiento, pk)
         if request.method == 'POST':
             form = EquipoDeEntrenamientoForm(request.POST, instance=instance)
             if 'crear' in request.POST:
                 form = EquipoDeEntrenamientoForm(request.POST)
                 if form.is_valid():
-                    form.save()
+                    nodo_zona = EquipoDeEntrenamiento.nodes.filter(id=form['fields']['id'])
+                    equipo1 = form.save()
+                    equipo1.zona.connect(connection_helper(Zona, form, 'zona'))
                     return redirect('/equipo/')
                 else:
                     messages.error(request, form.errors)
@@ -287,16 +345,17 @@ def EquipoDeEntrenamientoView(request, *args, **kwargs):
                 return redirect('/')
             elif 'actualizar' in request.POST:
                 if form.is_valid():
-                    form.save()
+                    equipo1 = form.save()
+                    equipo1.zona.disconnect_all()
+                    equipo1.zona.connect(connection_helper(Zona, form, 'zona'))
                     return redirect(f'/equipo/{pk}/')
                 messages.error(request, form.errors)
             elif 'buscar' in request.POST:
                 pk = request.POST.get('primary_key', None) or pk
-                if EquipoDeEntrenamiento.objects.filter(pk=pk).count() > 0:
+                if search_model_instance(EquipoDeEntrenamiento, pk) != None:
                     return redirect(f'/equipo/{pk}/')
                 else:
-                    messages.error(
-                        request, "Equipo De Entrenamiento no encontrado")
+                    messages.error(request, "EquipoEntrenamiento no encontrada")
                     form = EquipoDeEntrenamientoForm()
         else:
             form = EquipoDeEntrenamientoForm(instance=instance)
@@ -304,15 +363,16 @@ def EquipoDeEntrenamientoView(request, *args, **kwargs):
         if 'crear' in request.POST:
             form = EquipoDeEntrenamientoForm(request.POST)
             if form.is_valid():
-                form.save()
+                equipo1 = form.save()
+                equipo1.zona.connect(connection_helper(Zona, form, 'zona'))
+                
                 return redirect('/equipo/')
             else:
                 messages.error(request, form.errors)
         elif 'buscar' in request.POST:
             pk = request.POST.get('primary_key')
-            if pk is None or EquipoDeEntrenamiento.objects.filter(pk=pk).count() <= 0:
-                messages.error(
-                    request, "Equipo De Entrenamiento no encontrado")
+            if pk is None or search_model_instance(EquipoDeEntrenamiento, pk) == None:
+                messages.error(request, "EquipoEntrenamiento no encontrada")
                 form = EquipoDeEntrenamientoForm()
             else:
                 return redirect(f'/equipo/{pk}/')

@@ -1,47 +1,94 @@
-from neo4django.db import models
+from neomodel import (
+    StringProperty,
+    IntegerProperty,
+    DateTimeProperty,
+    DateProperty,
+    JSONProperty,
+    Relationship
+)
+from django_neomodel import DjangoNode
 from .choices import *
 
-class Calendario(models.NodeModel):
-    dia = models.StringProperty()
-    hora_inicial = models.TimeProperty()
-    hora_final = models.TimeProperty()
-    fecha_inicio = models.DateProperty()
-    fecha_final = models.DateProperty()
+class Calendario(DjangoNode):
+    # uid = UniqueIdProperty()
+    dia = StringProperty()
 
-class Zona(models.NodeModel):
-    piso = models.StringProperty()
-    tipo = models.StringProperty()
+    fecha_inicio = DateProperty()
+    fecha_final = DateProperty()
 
-class EquipoDeEntrenamiento(models.NodeModel):
-    nombre = models.StringProperty()
-    grupo_muscular = models.StringProperty()
-    zona = models.Relationship(Zona,rel_type='tiene_calendario',related_name='calendario')
+    class Meta:
+        app_label = 'gym'
+
+    def __str__(self):
+         return f"Dia:{self.dia} - entre {self.fecha_inicio} y {self.fecha_final}"
+
+class Zona(DjangoNode):
+    piso = StringProperty()
+    tipo = StringProperty()
+    class Meta:
+        app_label = 'gym'
+    
+    def __str__(self):
+        return f"{self.piso} piso - {self.tipo}"
+
+class EquipoDeEntrenamiento(DjangoNode):
+    nombre = StringProperty()
+    grupo_muscular = StringProperty()
+    zona = Relationship(Zona, "tiene")
+    fecha_mantemiento = DateProperty()
+    fecha_adquisicion = DateProperty()
+    marca = StringProperty()
+    cantidad = IntegerProperty()
+    class Meta:
+        app_label = 'gym'
+
+    def __str__(self):
+         return f"Maquina de {self.grupo_muscular} - Zona:{self.zona} - Adquisicion {self.fecha_adquisicion} - {self.cantidad} en inventario"
 
 
-class Rutina(models.NodeModel):
-    grupo_muscular = models.StringProperty()
-    cantidad_ejercicios = models.IntegerProperty()
-    dificultad = models.StringProperty()
-    repeticiones = models.IntegerProperty()
-    lista_equipos = models.StringProperty()
+class Rutina(DjangoNode):
+    grupo_muscular = StringProperty()
+    cantidad_ejercicios = IntegerProperty()
+    dificultad = StringProperty()
+    repeticiones = IntegerProperty()
+    lista_equipos = JSONProperty()
+    class Meta:
+        app_label = 'gym'
+
+    def __str__(self):
+         return f"{self.grupo_muscular} - {self.cantidad_ejercicios} ejercicios por {self.repeticiones} repeticiones - {self.dificultad}"
 
 
-class Clase(models.NodeModel):
-    nombre = models.StringProperty()
-    tipo = models.StringProperty()
-    costo = models.IntegerProperty()
-    rutina = models.Relationship(Rutina,rel_type='tiene_rutina',related_name='rutinas')
-    maximo_personas = models.IntegerProperty()
-    calendario = models.Relationship(Calendario,rel_type='tiene_calendario',single=True,related_name='calendario')
-    equipos_de_entrenamiento = models.Relationship()
+class Clase(DjangoNode):
+    nombre = StringProperty()
+    tipo = StringProperty()
+    costo = IntegerProperty()
+    zona = Relationship(Zona, "tiene")
+    rutina = Relationship("Rutina", "tiene")
+    maximo_personas = IntegerProperty()
+    calendario = Relationship("Calendario", "tiene")
+    equipos_de_entrenamiento = Relationship("EquipoDeEntrenamiento", "tiene")
+    class Meta:
+        app_label = 'gym'
 
-class Persona(models.NodeModel):
-    nombre = models.StringProperty()
-    tipo = models.StringProperty()
-    sexo = models.StringProperty()
-    plan_de_pago = models.StringProperty()
-    remuneracion = models.IntegerProperty()
-    clases = models.Relationship(Clase,rel_type='tiene_clase',related_name='clases')
+
+    def __str__(self):
+         return f"Clase de {self.tipo} - Costo: {self.costo} - Ubicacion:{self.zona} - Rutina:{self.rutina} - Max:{self.maximo_personas} personas - Calendario:{self.calendario} - Equipos Entrenamiento:{self.equipos_de_entrenamiento}"
+
+    
+
+class Persona(DjangoNode):
+    nombre = StringProperty()
+    tipo = StringProperty()
+    sexo = StringProperty()
+    plan_de_pago = StringProperty()
+    remuneracion = IntegerProperty()
+    clases = Relationship("Clase", "tiene")
+    class Meta:
+        app_label = 'gym'
+
+    def __str__(self):
+         return f"Nombre:{self.nombre} - {self.tipo} - Genero:{self.sexo} - Plan:{self.plan}"
 
 
 # class Calendario(models.Model):  # TODO
@@ -119,7 +166,7 @@ class Persona(models.NodeModel):
 #         max_length=255, choices=TiposDeClaseEnum.choices, null=False, blank=False)  # enum
 #     costo = models.IntegerField(default=0)
 #     zona = models.ForeignKey(
-#         'Zona', null=True, blank=True, on_delete=models.SET_NULL)
+#         'Zona', null=True, blank=True, on_1delete=models.SET_NULL)
 #     rutina = models.ForeignKey(
 #         'Rutina', null=False, blank=False, on_delete=models.CASCADE)
 #     maximo_personas = models.IntegerField(null=False, blank=False)

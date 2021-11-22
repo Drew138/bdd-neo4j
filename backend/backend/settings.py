@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import json
 import os
+from neomodel import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_neomodel',
     'gym'
 ]
 
@@ -94,14 +96,16 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     }
 # }
 
-NEO4J_DATABASES = {
-    'default' : {
-        'HOST':credentials['localhost'],
-        'PORT':credentials['port'],
-        'ENDPOINT':credentials['endpoint']
-    }
-}
+# NEO4J_DATABASES = {
+#     'default' : {
+#         'HOST':credentials['localhost'],
+#         'PORT':credentials['port'],
+#         'ENDPOINT':credentials['endpoint']
+#     }
+# }
 
+# config.DATABASE_URL = 'bolt://neo4j:center-lace-voucher@54.197.8.164:7687'
+NEOMODEL_NEO4J_BOLT_URL   = 'bolt://neo4j:center-lace-voucher@54.197.8.164:7687'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

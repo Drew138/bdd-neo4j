@@ -1,71 +1,78 @@
-from django.db import models
+DiasEnum = (
+    ('Seleccione una opcion', ''),
+    ('Lunes', 'Lunes'),
+    ('Martes', 'Martes'),
+    ('Miercoles', 'Miercoles'),
+    ('Jueves', 'Jueves'),
+    ('Viernes', 'Viernes'),
+    ('Sabado', 'Sabado'),
+    ('Domingo', 'Domingo')
+)
 
+DificultadesEnum = (
+    ('Seleccione una opcion', ''),
+    ('Inicial', 'Inicial'),
+    ('Intermedio', 'Intermedio'),
+    ('Avanzado', 'Avanzado')
+)
 
-class DiasEnum(models.TextChoices):
-    lunes = 'lunes', 'Lunes'
-    martes = 'martes', 'Martes'
-    miercoles = 'miercoles', 'Miercoles'
-    jueves = 'jueves', 'Jueves'
-    viernes = 'viernes', 'Viernes'
-    sabado = 'sabado', 'Sabado'
-    domingo = 'domingo', 'Domingo'
+PisosEnum = (
+    ('Seleccione una opcion', ''),
+    ('Primero', 'Primero'),
+    ('Segundo', 'Segundo'),
+    ('Tercero', 'Tercero'),
+    ('Cuarto', 'Cuarto')
+)
 
+SexoEnum = (
+    ('Seleccione una opcion', ''),
+    ('Masculino', 'Masculino'),
+    ('Femenino', 'Femenino')
+)
 
-class DificultadesEnum(models.TextChoices):
-    inicial = 'inicial', 'Inicial'
-    intermedio = 'intermedio', 'Intermedio'
-    avanzado = 'Avanzado', 'Avanzado'
+TipoZonasEnum = (
+    ('Seleccione una opcion', ''),
+    ('Musculacion', 'Musculacion'),
+    ('Cardio', 'Cardio')
+)
 
+PlanPagoEnum = (
+    ('Seleccione una opcion', ''),
+    ('Dia', 'Dia'),
+    ('Mes', 'Mes'),
+    ('Trimestral', 'Trimestral'),
+    ('Semestral', 'Semestral'),
+    ('Anual', 'Anual')
+)
 
-class PisosEnum(models.TextChoices):
-    primero = 'primero', 'Primero'
-    segundo = 'segundo', 'Segundo'
-    tercero = 'tercero', 'Tercero'
-    cuarto = 'cuarto', 'Cuarto'
+GrupoMuscularEnum = (
+    ('Seleccione una opcion', ''),
+    ('Pecho', 'Pecho'),
+    ('Hombro', 'Hombro'),
+    ('Triceps', 'Triceps'),
+    ('Biceps', 'Biceps'),
+    ('Espalda', 'Espalda'),
+    ('Trapecio', 'Trapecio'),
+    ('Abdomen', 'Abdomen'),
+    ('Isquiotibiales', 'Isquiotibiales'),
+    ('Cuadriceps', 'Cuadriceps'),
+    ('Gluteos', 'Gluteos')
+) 
 
+TiposDeClaseEnum = (
+    ('Seleccione una opcion', ''),
+    ('Yoga', 'Yoga'),
+    ('Fuerza', 'Fuerza'),
+    ('Cardio', 'Cardio'),
+    ('Danza', 'Danza'),
+    ('Zumba', 'Zumba')
+)
 
-class GrupoMuscularEnum(models.TextChoices):
-    pecho = 'pecho', 'Pecho'
-    hombro = 'hombro', 'Hombro'
-    triceps = 'triceps', 'Triceps'
-    biceps = 'biceps', 'Biceps'
-    espalda = 'espalda', 'Espalda'
-    trapecio = 'trapecio', 'Trapecio'
-    abdomen = 'abdomen', 'Abdomen'
-    isquiotibiales = 'isquiotibiales', 'Isquiotibiales'
-    cuadriceps = 'cuadriceps', 'Cuadriceps'
-    gluteos = 'gluteos', 'Gluteos'
-
-
-class TipoPersonaEnum(models.TextChoices):
-    entrenador = 'entrenador', 'Entrenador'
-    cliente = 'cliente', 'Cliente'
-    mantenimiento = 'mantenimiento', 'Mantenimiento'
-    servicios_varios = 'servicios varios', 'Servicios varios'
-    recepcion = 'recepcion', 'Recepcion'
-
-
-class PlanPagoEnum(models.TextChoices):
-    dia = 'dia', 'Dia'
-    mes = 'mes', 'Mes'
-    trimestral = 'trimestral', 'Trimestral'
-    semestral = 'semestral', 'Semestral'
-    anual = 'anual', 'Anual'
-
-
-class SexoEnum(models.TextChoices):
-    masculino = 'masculino', 'Masculino'
-    femenino = 'femenino', 'Femenino'
-
-
-class TipoZonasEnum(models.TextChoices):
-    musculacion = 'musculacion', 'Musculacion'
-    cardio = 'cardio', 'Cardio'
-
-
-class TiposDeClaseEnum(models.TextChoices):
-    yoga = 'yoga', 'Yoga'
-    fuerza = 'fuerza', 'Fuerza'
-    cardio = 'cardio', 'Cardio'
-    danza = 'danza', 'Danza'
-    zumba = 'zumba', 'Zumba'
+TipoPersonaEnum = (
+    ('Seleccione una opcion', ''),
+    ('Entrenador', 'Entrenador'),
+    ('Cliente', 'Cliente'),
+    ('Mantenimiento', 'Mantenimiento'),
+    ('Recepcion Varios', 'Recepcion Varios'),
+    ('Recepcion', 'Recepcion')
+)
