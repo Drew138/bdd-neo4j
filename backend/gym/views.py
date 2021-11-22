@@ -29,6 +29,8 @@ def ClaseView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
         instance = search_model_instance(Clase, pk)
+        if not instance:
+            raise Exception('404 Alejo es gay')
         if request.method == 'POST':
             form = ClaseForm(request.POST, instance=instance)
             if 'crear' in request.POST:
@@ -158,6 +160,10 @@ def ZonaView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
         instance = search_model_instance(Zona, pk)
+        if not instance:
+            raise Exception('404 Alejo es gay')
+        if not instance:
+            raise Exception('404 Alejo es gay')
         if request.method == 'POST':
             form = ZonaForm(request.POST, instance=instance)
             print(request.POST)
@@ -216,6 +222,8 @@ def RutinaView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
         instance = search_model_instance(Rutina, pk)
+        if not instance:
+            raise Exception('404 Alejo es gay')
         if request.method == 'POST':
             form = RutinaForm(request.POST, instance=instance)
             if 'crear' in request.POST:
@@ -269,6 +277,9 @@ def PersonaView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
         instance = search_model_instance(Persona, pk)
+        if not instance:
+            raise Exception('404 Alejo es gay')
+
         if request.method == 'POST':
             form = PersonaForm(request.POST, instance=instance)
             if 'crear' in request.POST:
@@ -329,6 +340,8 @@ def EquipoDeEntrenamientoView(request, *args, **kwargs):
     if 'pk' in kwargs:
         pk = kwargs['pk']
         instance = search_model_instance(EquipoDeEntrenamiento, pk)
+        if not instance:
+            raise Exception('404 Alejo es gay')
         if request.method == 'POST':
             form = EquipoDeEntrenamientoForm(request.POST, instance=instance)
             if 'crear' in request.POST:
